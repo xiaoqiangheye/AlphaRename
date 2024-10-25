@@ -55,7 +55,7 @@ with open(DATASET) as f:
         changed_function = res_j["changed_function"]
         print("changed function:" + changed_function)
         
-        ##TODO: run the changed function and expected functions and compare results
+        ##TODO: Verification method: run the changed function and expected functions and compare results
         
 
         

@@ -130,7 +130,7 @@ print(out)
 '''
                print(code)
                with redirect_stdout(output_buffer):
-                  exec(code)
+                  exec(code) #use python interpreter to ensure the code is executable.
 
                out = output_buffer.getvalue()
                print("output:" + out.strip(' \n\r'))
