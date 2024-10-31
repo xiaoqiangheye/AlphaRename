@@ -6,7 +6,7 @@ import json
 PROJECT_ID = "alpha-rename"
 vertexai.init(project=PROJECT_ID, location="us-central1")
 HINT_FILE = "hints.json"
-model = GenerativeModel("gemini-1.5-flash")
+model = GenerativeModel("gemini-1.5-pro")
 generation_config = GenerationConfig(
     temperature=1.5,
     top_k=40,
@@ -16,7 +16,7 @@ generation_config = GenerationConfig(
 prompt = lambda hint: '''
 We would like to generate datasets for alpha-renaming tasks, changing a function argument name to another name and preserve the semantics. \n
 That means bounded variables should not be changed even if the name is identical to the argument name. \n
-Generate dataset of pairs of original python function, a target argument name, a name to change original argument to, after-changed function, and function call expression with input 1, output with the following format.
+Generate dataset of pairs of original python function, a target argument name, a name to change original argument to, after-changed function, and function name, output with the following format.
 Note that you only need to generate the dataset, not the alpha-renaming function. The dataset is with the following format.
 
 \'\'\'format start\'\'\'
@@ -24,8 +24,8 @@ Note that you only need to generate the dataset, not the alpha-renaming function
   change_to: “the argument name we want to change to”,
   original_function: “this is where to put original functions”,
   changed_function: “this is where to put the alpha-renamed one of the original functions”,
-  function_call: "this is where to put the function call expression of the original function"
-  
+  function_call: "this is where to put the function call expression of the original function",
+  function_name : "function name"
 }
 \'\'\'format ends\'\'\'
 
@@ -34,33 +34,42 @@ We also have an example output.
 ‘’’Example begin’’’
 { target_argument : “f”,
   change_to: “a”,
+  change_to: “a”,
   original_function: “def foo (f: int):\n
                               a = 1\n
+	                          return (lambda f: f 1)(lambda y: y + f)\n”,
 	                          return (lambda f: f 1)(lambda y: y + f)\n”,
   changed_function: “def foo (a: int):\n
                               b = 1\n
 	                          return (lambda f: f 1)(lambda y: y + a)”,
-  function call: "foo(1)"
+  inputs: [input1, input2...]
 }
 ‘’’Example end’’’
 
 But, we need more complex functions that involve more lambda functions and more arguments with the same name but in different scopes.
-1. Please generate function examples that are more than 5 lines with local function definitions or lambda definitions.
+1. Please generate function examples that are more than 5 lines.
 2. Each function should only has only one argument.
 3. Gain inspiration from the hint text '{hint}'
-4. Consider also common algorithms such sorting, dfs, bfs....from algorithm classes, implement them in resursive functional versions.
+4. Consider also common algorithms such sorting, dfs, bfs....from algorithm classes.
 5. Once the argument is changed, you might need to check if it has conflict with other variables in scope, in that case you need to also rename other variables in conflict to fresh names to preserve semantics.
 6. Output in Json format
 7. Generate 5 example, each one has different function name. Output in a json list, [example1, example2...].
-8. Ensure the Code is e
+8. Also generate a list of 5 valid inputs for each function as a json list. [input1, input2...].
+9. there should be conflict of sames names for the changed_name and existing names in the function in different scope to make problems more complex.
 '''
 
 
+NUM_SAMPLES = 5
+EACH_TIME = 5
+OUTPUT_FILE = "data_alpha.json"
+
+iterations = NUM_SAMPLES // EACH_TIME
 datas = []
 with open(HINT_FILE,"r") as f:
     hints = json.load(f)
-    for hint in hints:
-        response = model.generate_content(prompt(hints[1]), generation_config=generation_config)
+    for i in range(iterations):
+        response = model.generate_content(prompt(hints[i]), generation_config=generation_config)
+        print(response.text)
         data_res = json.loads(response.text)
         for data in data_res:
             argument_name = data["target_argument"]
