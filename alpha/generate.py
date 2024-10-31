@@ -79,6 +79,5 @@ with open(HINT_FILE,"r") as f:
             ## generate the right after change function. See generate_execution.py to use python interpreter.
             datas.append(data)
 
-OUTPUT_FILE = "data_text.json"
 with open(OUTPUT_FILE, "w") as outfile:
     json.dump(datas, outfile)
