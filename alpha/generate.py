@@ -52,19 +52,19 @@ But, we need more complex functions that involve more lambda functions and more 
 3. Gain inspiration from the hint text '{hint}'
 4. Consider also common algorithms such sorting, dfs, bfs....from algorithm classes.
 5. Once the argument is changed, you might need to check if it has conflict with other variables in scope, in that case you need to also rename other variables in conflict to fresh names to preserve semantics.
-6. Output in Json format
+6. Output in Json format, very important
 7. Generate 5 example, each one has different function name. Output in a json list, [example1, example2...].
 8. Also generate a list of 5 valid inputs for each function as a json list. [input1, input2...].
 9. there should be conflict of sames names for the changed_name and existing names in the function in different scope to make problems more complex.
 '''
 
 
-NUM_SAMPLES = 5
+NUM_SAMPLES = 10
 EACH_TIME = 5
 OUTPUT_FILE = "data_alpha.json"
 
 iterations = NUM_SAMPLES // EACH_TIME
-datas = []
+valid_data = []
 with open(HINT_FILE,"r") as f:
     hints = json.load(f)
     for i in range(iterations):
@@ -77,16 +77,32 @@ with open(HINT_FILE,"r") as f:
             original_function = data["original_function"]
             change_to = data["change_to"]
             function_call = data["function_call"]
+            function_name = data["function_name"]
+            inputs = data["inputs"]
 
             print("argument_name: ",argument_name)
             print("changed_function", changed_function)
             print("original_function", original_function)
             print("change_to", change_to)
             print("function_call", function_call)
+            print("function_name", function_name)
+            print("inputs", inputs)
             
             ## we could also add verification here to ensure the generated code is executable and
             ## generate the right after change function. See generate_execution.py to use python interpreter.
-            datas.append(data)
+            try:
+                original_program = original_function+"\n"+function_name+"("+inputs[0]+")"
+                changed_program  = changed_function +"\n"+function_name+"("+inputs[0]+")"
+                
+                exec(original_program)
+                exec(changed_program)
+
+                valid_data.append(data)
+                
+            except Exception as e:
+                pass    
 
 with open(OUTPUT_FILE, "w") as outfile:
-    json.dump(datas, outfile)
+    json.dump(valid_data, outfile)
+
+print(len(valid_data), "valid data")
