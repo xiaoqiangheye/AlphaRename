@@ -95,7 +95,7 @@ with open(HINT_FILE,"r") as f:
                 changed_program  = changed_function +"\n"+function_name+"("+inputs[0]+")"
                 
                 exec(original_program)
-                exec(changed_program)
+                # exec(changed_program)
 
                 valid_data.append(data)
                 
