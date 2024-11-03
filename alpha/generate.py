@@ -49,20 +49,19 @@ But, we need more complex functions that involve more lambda functions and more 
 2. Each function should only has only one argument, each arugment has simple types such as bool, int, strings, list of simple types.
 3. Gain inspiration from the hint text '{hint}'
 4. Once the argument is changed, you might need to check if it has conflict with other variables in scope, in that case you need to also rename other variables in conflict to fresh names to preserve semantics.
-5. Output in Json format
+5. Output in Json format, very important
 6. Generate 5 example, each one has different function name. Output in a json list, [example1, example2...].
-7. Also generate a list of 5 valid inputs for each function as a json list, ["input1", "input2"...]. The inputs should be simple inputs like int, bool, strings, tuples of base types or list of base types.
-   each input should be quoted as strings and adhere to python language and can be directly pass to a python function.
+7. Also generate a list of 5 valid inputs for each function as a json list. [input1, input2...].
 8. there should be conflict of sames names for the changed_name and existing names in the function in different scope to make problems more complex.
 '''
 
 
-NUM_SAMPLES = 5
+NUM_SAMPLES = 10
 EACH_TIME = 5
 OUTPUT_FILE = "data_alpha.json"
 
 iterations = NUM_SAMPLES // EACH_TIME
-datas = []
+valid_data = []
 with open(HINT_FILE,"r") as f:
     hints = json.load(f)
     for i in range(iterations):
@@ -74,6 +73,7 @@ with open(HINT_FILE,"r") as f:
             changed_function = data["changed_function"]
             original_function = data["original_function"]
             change_to = data["change_to"]
+
             functiton_name = data["function_name"]
             inputs = data["inputs"]
 
@@ -81,17 +81,25 @@ with open(HINT_FILE,"r") as f:
             print("changed_function", changed_function)
             print("original_function", original_function)
             print("change_to", change_to)
-            print("function_name", functiton_name)
+            print("function_name", function_name)
             print("inputs", inputs)
+            
             ## we could also add verification here to ensure the generated code is executable and
             ## generate the right after change function. See generate_execution.py to use python interpreter.
-            for inp in inputs:
-                command = f'''
-out = {functiton_name}({inp})
-print(out)
+            try:
+                original_program = original_function+"\n"+function_name+"("+inputs[0]+")"
+                changed_program  = changed_function +"\n"+function_name+"("+inputs[0]+")"
                 
-'''
-            datas.append(data)
+                exec(original_program)
+                # exec(changed_program)
+
+                valid_data.append(data)
+                
+            except Exception as e:
+                pass    
+
 
 with open(OUTPUT_FILE, "w") as outfile:
-    json.dump(datas, outfile)
+    json.dump(valid_data, outfile)
+
+print(len(valid_data), "valid data")
