@@ -12,7 +12,7 @@ from contextlib import redirect_stdout
 PROJECT_ID = "alpha-rename"
 HINT = "hints.json"
 
-prompt = lambda hint: '''
+prompt = lambda hint: f'''
 We would like to generate instructional dataset for code executions tasks that involve
 subsitution and higher order lambda functions passing around. 
 
@@ -20,18 +20,18 @@ The dataset is a pair of code and small-step style execution traces with step of
 each step is tranformed.
 
 \'\'\'format start\'\'\'
-{  function_name: "function name",
+{{  function_name: "function name",
    function: “this is where to put original functions”,
    command : foo(1), 
    traces: “this is where to put the of the original functions”
    output : output based on the traces that you reasoned
-}
+}}
 \'\'\'format ends\'\'\'
 
 We also have an example output.
 
 ‘’’Example begin’’’
-{ 
+{{ 
   function_name: "foo",
   function: “def foo (f: int)\n :
 	                          (lambda f: f 1)(lambda y: y + f)”
@@ -45,7 +45,7 @@ We also have an example output.
            5. 1 + 1 = 2 // arithematic calculations\n
           ",
    ouput: 2
-}
+}}
 ‘’’Example end’’’
 
 But, we need more complex functions. Here are some guidelines.

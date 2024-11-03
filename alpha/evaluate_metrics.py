@@ -2,11 +2,6 @@ import json
 import io
 from contextlib import redirect_stdout
 
-# path = './data_alpha.json'
-path = './starcoder_data_alpha.json'
-f = open(path, 'r')
-
-data_res = json.loads(f.read())
 
 def evaluate(original_function, changed_function, function_name, inputs):
     accurate_results = 0
@@ -35,23 +30,26 @@ def evaluate(original_function, changed_function, function_name, inputs):
     except Exception as e:
         return 0
 
-total_count, total_accuracy = 0, 0
 
-for data in data_res:
 
-    total_count +=1 
+def start_evaluate(path="./starcoder_data_alpha.json"):
 
-    argument_name = data["target_argument"]
-    changed_function = data["changed_function"]
-    original_function = data["original_function"]
-    change_to = data["change_to"]
-    function_call = data["function_call"]
-    function_name = data["function_name"]
-    inputs = data["inputs"]
-    
-    accuracy = evaluate(original_function, changed_function, function_name, inputs)
-    total_accuracy += accuracy
+    with open(path, 'r') as f:
+        data_res = json.loads(f.read())
 
-    # print(total_count, accuracy)
+    total_count, total_accuracy = 0, 0
+    for data in data_res:
+        total_count +=1 
+        argument_name = data["target_argument"]
+        changed_function = data["changed_function"]
+        original_function = data["original_function"]
+        change_to = data["change_to"]
+        function_name = data["function_name"]
+        inputs = data["inputs"]
+        
+        accuracy = evaluate(original_function, changed_function, function_name, inputs)
+        total_accuracy += accuracy
 
-print("final accuracy: ", total_accuracy/total_count)
+        # print(total_count, accuracy)
+
+    print("final accuracy: ", total_accuracy/total_count)
