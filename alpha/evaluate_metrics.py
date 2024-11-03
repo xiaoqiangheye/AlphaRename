@@ -1,6 +1,9 @@
 import json
+import io
+from contextlib import redirect_stdout
 
-path = './data_alpha.json'
+# path = './data_alpha.json'
+path = './starcoder_data_alpha.json'
 f = open(path, 'r')
 
 data_res = json.loads(f.read())
@@ -10,11 +13,21 @@ def evaluate(original_function, changed_function, function_name, inputs):
     try: 
         for val in inputs:
             function_call = function_name+"("+val+")"
-            original_program = original_function + "\n" + function_call
-            changed_program  = changed_function + "\n" + function_call
+            original_program = original_function + "\nprint(" + function_call +')'
+            changed_program  = changed_function + "\nprint(" + function_call +')'
 
-            original_output = exec(original_program)
-            changed_output  = exec(changed_program)
+            original_buffer = io.StringIO()
+            with redirect_stdout(original_buffer):
+                exec(original_program)
+            original_output = original_buffer.getvalue().strip()
+            # print(original_output)
+            
+            changed_buffer = io.StringIO()
+            with redirect_stdout(changed_buffer):
+                exec(changed_program)
+            changed_output = changed_buffer.getvalue().strip()
+
+            # print(original_output, changed_output)
 
             if original_output == changed_output: accurate_results+=1
 
@@ -39,6 +52,6 @@ for data in data_res:
     accuracy = evaluate(original_function, changed_function, function_name, inputs)
     total_accuracy += accuracy
 
-    print(total_count, accuracy)
+    # print(total_count, accuracy)
 
 print("final accuracy: ", total_accuracy/total_count)
