@@ -12,7 +12,7 @@ mbpp = load_dataset("google-research-datasets/mbpp", "full")
 # TODO(developer): Update and un-comment below line
 PROJECT_ID = "alpha-rename"
 vertexai.init(project=PROJECT_ID, location="us-central1")
-HINT_FILE = "hints.json"
+HINT_FILE = "./hints.json"
 model = GenerativeModel("gemini-1.5-flash")
 generation_config = GenerationConfig(
     temperature=1.5,
