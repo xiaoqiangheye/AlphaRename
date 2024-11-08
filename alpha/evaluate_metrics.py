@@ -53,3 +53,4 @@ def start_evaluate(path="./starcoder_data_alpha.json"):
         # print(total_count, accuracy)
 
     print("final accuracy: ", total_accuracy/total_count)
+    return total_accuracy/total_count
