@@ -2,8 +2,6 @@ import vertexai
 from vertexai.generative_models import GenerativeModel, GenerationConfig
 import json
 from datasets import load_dataset
-
-from datasets import load_dataset
 from evaluate_metrics import evaluate
 
 mbpp = load_dataset("google-research-datasets/mbpp", "full")
@@ -109,11 +107,12 @@ with open(HINT_FILE,"r") as f:
                         valid_data.append(data)
                 else:
                     try:
-                        original_program = original_function+"\n"+function_name+"("+inputs[0]+")"
-                        changed_program  = changed_function +"\n"+function_name+"("+inputs[0]+")"
-                        #only check execution of original program if check valid is not true
-                        exec(original_program)
-                        # exec(changed_program)
+                        for test_case in inputs:
+                            original_program = original_function+"\n"+function_name+"("+test_case+")"
+                            changed_program  = changed_function +"\n"+function_name+"("+test_case+")"
+                            #only check execution of original program if check valid is not true
+                            exec(original_program)
+                            # exec(changed_program)
                         valid_data.append(data)
                     except Exception as e:
                         pass
