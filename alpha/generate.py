@@ -2,6 +2,8 @@ import vertexai
 from vertexai.generative_models import GenerativeModel, GenerationConfig
 import json
 from datasets import load_dataset
+
+from datasets import load_dataset
 from evaluate_metrics import evaluate
 
 mbpp = load_dataset("google-research-datasets/mbpp", "full")
@@ -51,33 +53,35 @@ We also have an example output.
 
 ‘’’Example end’’’
 
-But, we need more complex functions that involve more lambda functions and more arguments with the same name but in different scopes.
+But, we need more complex functions.
 1. Please generate function examples that are more than 5 lines.
-2. Each function should only has only one argument, each arugment has simple types such as bool, int, strings, list of simple types.
+2. Each function should only has only one argument, each arugment has base types such as bool, int, strings, or list or tuple of simple types.
 3. Gain inspiration from the hint text
 <<
 {hint}
 >>
-4. Once the argument is changed, you might need to check if it has conflict with other variables in scope, in that case you need to also rename other variables in conflict to fresh names to preserve semantics.
+4. For after-change funciton, you might need to check if it has conflict with other variables in scope, in that case you need to also rename other variables in conflict to fresh names to preserve semantics.
 5. Output in Json format, very important
 6. Generate {num} example, each one has different function name. Output in a json list, [example1, example2...].
 7. Also generate a list of 5 valid inputs for each function as a json list. ["input1", "input2"...]. Input must be in python expressions that is quoted as string and can
 directly be feeded into the function.
-8. there should be conflict of sames names for the changed_name and existing names in the function in different scope to make problems more complex.
+8. You should pick a change name that already exists in the origin function to create name conflicts to make problem more complex.
+9. To make dataset complex, the function should contain lambda functions and many bounded variables that might have same name with original argument and also
+variables that might have same name with the after-changed name.
 '''
 
 
 NUM_SAMPLES = 500
 EACH_TIME = 10
-CHECK_VALID = True
-OUTPUT_FILE = "data_alpha_500.json"
+CHECK_VALID = False
+OUTPUT_FILE = "data_alpha_non_valid_after_change_500.json"
 
 iterations = NUM_SAMPLES // EACH_TIME
 valid_data = []
 with open(HINT_FILE,"r") as f:
     hints = json.load(f)
     for i in range(iterations):
-        #print("prompt", prompt(EACH_TIME, mbpp["test"][i]["code"]))
+        print("prompt", prompt(EACH_TIME, mbpp["test"][i]["code"]))
         response = model.generate_content(prompt(EACH_TIME, mbpp["test"][i]["code"]), generation_config=generation_config)
         print(response.text)
         try:
@@ -107,12 +111,11 @@ with open(HINT_FILE,"r") as f:
                         valid_data.append(data)
                 else:
                     try:
-                        for test_case in inputs:
-                            original_program = original_function+"\n"+function_name+"("+test_case+")"
-                            changed_program  = changed_function +"\n"+function_name+"("+test_case+")"
-                            #only check execution of original program if check valid is not true
-                            exec(original_program)
-                            # exec(changed_program)
+                        original_program = original_function+"\n"+function_name+"("+inputs[0]+")"
+                        changed_program  = changed_function +"\n"+function_name+"("+inputs[0]+")"
+                        #only check execution of original program if check valid is not true
+                        exec(original_program)
+                        # exec(changed_program)
                         valid_data.append(data)
                     except Exception as e:
                         pass
