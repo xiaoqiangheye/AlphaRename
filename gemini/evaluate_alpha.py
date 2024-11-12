@@ -6,7 +6,7 @@ import json
 import alpha.evaluate_metrics as alpha
 
 PROJECT_ID = "alpha-rename"
-DATASET = "alpha/data_alpha_363_valid.json"
+DATASET = "alpha/data_alpha_non_valid_after_change_500.json"
 vertexai.init(project=PROJECT_ID, location="us-central1")
 model = GenerativeModel("gemini-1.5-flash")
 generation_config = GenerationConfig(
@@ -15,7 +15,6 @@ generation_config = GenerationConfig(
    )
 prompt = '''You are a code programmer, we would like you to perform a alpha-renaming task a given function, 
 changing a function argument name to another name and preserve the semantics. \n
-You probably need to rename other names in the functions to avoid name conflits. \n
 
 Here is the function
 

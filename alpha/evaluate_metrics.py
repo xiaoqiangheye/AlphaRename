@@ -32,7 +32,7 @@ def evaluate(original_function, changed_function, function_name, inputs):
 
 
 
-def start_evaluate(path="./starcoder_data_alpha.json"):
+def start_evaluate(path="alpha/deepseek_data_alpha.json"):
 
     with open(path, 'r') as f:
         data_res = json.loads(f.read())
@@ -54,3 +54,8 @@ def start_evaluate(path="./starcoder_data_alpha.json"):
 
     print("final accuracy: ", total_accuracy/total_count)
     return total_accuracy/total_count
+
+
+
+if __name__ == "__main__":
+    start_evaluate()
