@@ -27,19 +27,23 @@ def evaluate(path = './alpha/dataset/data_alpha_non_valid2.json'):
 		total_count += 1
 		argument_name = data["target_argument"]
 		change_to = data["change_to"]
-		changed_function = data["changed_function"]
+		#changed_function = data["changed_function"]
 		original_function = data["original_function"]
 		function_name = data["function_name"]
 		inputs = data["inputs"]
 
 		changed_function = generate_function(original_function, function_name, argument_name, change_to)
-		#data["changed_function"] = changed_function
+        data["changed_function"] = changed_function
 
 
 		accuracy = alpha.evaluate(original_function, changed_function, function_name, inputs)
 		total_accuracy += accuracy
 	
-	print("final accuracy:", total_accuracy/total_count)
+    outfile = open("../alpha/evaluation_data/starcoder_data_alpha_non_valid2.json", 'w')
+    outfile.write(json.dumps(data_res))
+    outfile.close()
+	
+    print("final accuracy:", total_accuracy/total_count)
 	return total_accuracy, total_count
 
 

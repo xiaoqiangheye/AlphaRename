@@ -35,6 +35,6 @@ for data in data_res:
     print(changed_function)
     data["changed_function"] = changed_function
 
-outfile = open("../alpha/evaluation_data/deepseek_chat_data_alpha.json", 'w')
+outfile = open("../alpha/evaluation_data/deepseek_data_alpha_non_valid2.json", 'w')
 outfile.write(json.dumps(data_res))
 outfile.close()
