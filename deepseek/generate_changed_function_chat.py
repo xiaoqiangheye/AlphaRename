@@ -5,7 +5,7 @@ import json
 tokenizer = AutoTokenizer.from_pretrained("deepseek-ai/deepseek-coder-6.7b-base", trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained("deepseek-ai/deepseek-coder-6.7b-base", trust_remote_code=True, torch_dtype=torch.bfloat16).cuda()
 
-path = '../../alpha/dataset/data_alpha_non_valid2.json'
+path = '../../alpha/dataset/data_non_valid_after_change_500.json'
 f = open(path, 'r')
 data_res = json.loads(f.read())
 

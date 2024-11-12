@@ -6,7 +6,6 @@ import json
 import alpha.evaluate_metrics as alpha
 
 PROJECT_ID = "alpha-rename"
-DATASET = "alpha/data_alpha_363_valid.json"
 vertexai.init(project=PROJECT_ID, location="us-central1")
 model = GenerativeModel("gemini-1.5-flash")
 generation_config = GenerationConfig(
@@ -15,14 +14,13 @@ generation_config = GenerationConfig(
    )
 prompt = '''You are a code programmer, we would like you to perform a alpha-renaming task a given function, 
 changing a function argument name to another name and preserve the semantics. \n
-You probably need to rename other names in the functions to avoid name conflits. \n
 
 Here is the function
 
 ``function begins``
 '''
 
-def evaluate():
+def evaluate(DATASET = "alpha/dataset/data_alpha_non_valid2.json"):
   # read dataset
   with open(DATASET) as f:
       dataset = json.load(f)
@@ -57,5 +55,6 @@ def evaluate():
           ##TODO: Verification method: run the changed function and expected functions and compare results
           accuracy = alpha.evaluate(original_function, changed_function, name, inputs)
           total_accuracy += accuracy
-    
+
   print("final accuracy: ", total_accuracy/total_count)
+  return total_accuracy, total_count
