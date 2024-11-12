@@ -20,7 +20,7 @@ Here is the function
 ``function begins``
 '''
 
-def evaluate(DATASET = "alpha/dataset/data_alpha_non_valid_after_change_500.json"):
+def evaluate(DATASET = "alpha/dataset/data_alpha_non_valid2.json"):
   # read dataset
   with open(DATASET) as f:
       dataset = json.load(f)

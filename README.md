@@ -8,6 +8,9 @@ Run Gemini Evaluation
 Run Lamma Evaluation
 `python -m llama`
 
+Run StarCoder Evaluation
+`python -m starcoder`
+
 Generate dataset
 `python alpha/generate.py`
 

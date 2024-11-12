@@ -1,5 +1,6 @@
 import requests
 import json
+import alpha.evaluate_metrics as alpha
 
 API_URL = "https://api-inference.huggingface.co/models/bigcode/starcoder"
 headers = {"Authorization": "Bearer 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"}
@@ -17,24 +18,30 @@ def generate_function(original_function, function_name, argument_name, change_to
 	print(changed_function)
 	return changed_function
 
-path = '../alpha/dataset/data_non_valid_after_change_500.json'
-f = open(path, 'r')
-data_res = json.loads(f.read())
+def evaluate(path = './alpha/dataset/data_alpha_non_valid2.json'):
+	f = open(path, 'r')
+	data_res = json.loads(f.read())
+	total_count = 0
+	total_accuracy = 0
+	for data in data_res:
+		total_count += 1
+		argument_name = data["target_argument"]
+		change_to = data["change_to"]
+		changed_function = data["changed_function"]
+		original_function = data["original_function"]
+		function_name = data["function_name"]
+		inputs = data["inputs"]
 
-for data in data_res:
-
-	argument_name = data["target_argument"]
-	change_to = data["change_to"]
-	changed_function = data["changed_function"]
-	original_function = data["original_function"]
-	function_name = data["function_name"]
-	inputs = data["inputs"]
-
-	changed_function = generate_function(original_function, function_name, argument_name, change_to)
-	data["changed_function"] = changed_function
+		changed_function = generate_function(original_function, function_name, argument_name, change_to)
+		#data["changed_function"] = changed_function
 
 
-outfile = open("../alpha/starcoder_data_alpha.json", 'w')
-outfile.write(json.dumps(data_res))
-outfile.close()
+		accuracy = alpha.evaluate(original_function, changed_function, function_name, inputs)
+		total_accuracy += accuracy
+	
+	print("final accuracy:", total_accuracy/total_count)
+	return total_accuracy, total_count
+
+
+	
 
