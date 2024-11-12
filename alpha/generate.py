@@ -65,8 +65,9 @@ But, we need more complex functions.
 6. Generate {num} example, each one has different function name. Output in a json list, [example1, example2...].
 7. Also generate a list of 5 valid inputs for each function as a json list. ["input1", "input2"...]. Input must be in python expressions that is quoted as string and can
 directly be feeded into the function.
-8. You should pick a after-change name that already exists in the functions to create name conflicts to make problem more complex. For example if you want to chagne x
-to n, then n must already exists in the original function.
+8. You should pick a change name that already exists in the origin function to create name conflicts to make problem more complex.
+9. To make dataset complex, the function should contain lambda functions and many bounded variables that might have same name with original argument and also
+variables that might have same name with the after-changed name.
 '''
 
 
