@@ -7,7 +7,7 @@ starcoder_results = start_evaluate('alpha/starcoder_data_alpha.json')
 print('starcoder: ', starcoder_results)
 f.write('starcoder: ' + str(starcoder_results) + '\n')
 
-deepseek_results = start_evaluate('alpha/deepseek_data_alpha.json')
+deepseek_results = start_evaluate('alpha/deepseek_chat_data_alpha.json')
 print('deepseek: ', deepseek_results)
 f.write('deepseek: ' + str(deepseek_results) + '\n')
 
