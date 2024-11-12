@@ -6,7 +6,6 @@ import json
 import alpha.evaluate_metrics as alpha
 
 PROJECT_ID = "alpha-rename"
-DATASET = "alpha/data_alpha_non_valid_after_change_500.json"
 vertexai.init(project=PROJECT_ID, location="us-central1")
 model = GenerativeModel("gemini-1.5-flash")
 generation_config = GenerationConfig(
@@ -21,7 +20,7 @@ Here is the function
 ``function begins``
 '''
 
-def evaluate():
+def evaluate(DATASET = "alpha/dataset/data_alpha_non_valid_after_change_500.json"):
   # read dataset
   with open(DATASET) as f:
       dataset = json.load(f)
@@ -56,5 +55,6 @@ def evaluate():
           ##TODO: Verification method: run the changed function and expected functions and compare results
           accuracy = alpha.evaluate(original_function, changed_function, name, inputs)
           total_accuracy += accuracy
-    
+
   print("final accuracy: ", total_accuracy/total_count)
+  return total_accuracy, total_count

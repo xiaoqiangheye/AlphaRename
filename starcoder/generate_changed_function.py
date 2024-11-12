@@ -17,7 +17,7 @@ def generate_function(original_function, function_name, argument_name, change_to
 	print(changed_function)
 	return changed_function
 
-path = '../alpha/data_alpha_347_valid.json'
+path = '../alpha/dataset/data_non_valid_after_change_500.json'
 f = open(path, 'r')
 data_res = json.loads(f.read())
 

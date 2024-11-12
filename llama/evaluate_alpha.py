@@ -17,7 +17,7 @@ pipeline = transformers.pipeline(
 
 # API_URL = "https://api-inference.huggingface.co/models/meta-llama/CodeLlama-7b-hf"
 # headers = {"Authorization": "Bearer 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"}
-DATASET = "alpha/data_nonvalid_after_change.json"
+DATASET = "alpha/dataset/data_nonvalid_after_change_500.json"
 
 def generate_function(original_function, function_name, argument_name, change_to):
 	prompt = f'''Given a python function {function_name}

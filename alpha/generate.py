@@ -12,7 +12,7 @@ mbpp = load_dataset("google-research-datasets/mbpp", "full")
 # TODO(developer): Update and un-comment below line
 PROJECT_ID = "alpha-rename"
 vertexai.init(project=PROJECT_ID, location="us-central1")
-HINT_FILE = "./hints.json"
+HINT_FILE = "alpha/hints.json"
 model = GenerativeModel("gemini-1.5-flash")
 generation_config = GenerationConfig(
     temperature=1.5,
@@ -72,9 +72,9 @@ variables that might have same name with the after-changed name.
 
 
 NUM_SAMPLES = 500
-EACH_TIME = 10
+EACH_TIME = 5
 CHECK_VALID = False
-OUTPUT_FILE = "data_alpha_non_valid_after_change_500.json"
+OUTPUT_FILE = "data_alpha_non_valid2.json"
 
 iterations = NUM_SAMPLES // EACH_TIME
 valid_data = []
