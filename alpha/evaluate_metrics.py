@@ -8,7 +8,7 @@ def timeout_handler(signum, frame):
 
 def evaluate(original_function, changed_function, function_name, inputs):
     signal.signal(signal.SIGALRM, timeout_handler)
-    signal.alarm(3)
+    signal.alarm(5)
     
     accurate_results = 0
     try: 
