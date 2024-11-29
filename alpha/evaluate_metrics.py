@@ -18,7 +18,6 @@ def evaluate(original_function, changed_function, function_name, inputs):
             changed_program  = changed_function + "\nprint(" + function_call +')'
 
             original_buffer = io.StringIO()
-        
             with redirect_stdout(original_buffer):
                 exec(original_program)
             original_output = original_buffer.getvalue().strip()
@@ -29,12 +28,13 @@ def evaluate(original_function, changed_function, function_name, inputs):
                     exec(changed_program)
                 changed_output = changed_buffer.getvalue().strip()
             except TimeoutError as e:
-                # changed_output = original_output*0.1
+                print(e)
                 return 0
 
-            # print(original_output, changed_output)
-
+            #print(val, original_output, changed_output)
+            
             if original_output == changed_output: accurate_results+=1
+            #else: print(original_output, changed_output)
         print(accurate_results/len(inputs))
         return accurate_results/len(inputs)
     except Exception as e:
@@ -56,8 +56,7 @@ def start_evaluate(path="alpha/deepseek_data_alpha.json"):
         change_to = data["change_to"]
         function_name = data["function_name"]
         inputs = data["inputs"]
-       
-        accuracy = evaluate(original_function, changed_function, function_name, inputs)
+        accuracy = evaluate(original_function.strip(), changed_function.strip(), function_name, inputs)
         total_accuracy += accuracy
 
         print(total_count, accuracy)
