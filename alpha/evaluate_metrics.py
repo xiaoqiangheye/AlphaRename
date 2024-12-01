@@ -3,6 +3,36 @@ import io
 from contextlib import redirect_stdout
 
 
+
+def evaluate_substitution(original_function, function_name, argument, expr, output_expr, inputs):
+    accurate_results = 0
+    try:
+        for val in inputs:
+            original_program = original_function+"\n"+"print("+function_name+f"(lambda {argument}:{expr})({inputs[val]}))"
+            changed_program = '''
+def dummy():
+    {output_expr}
+print(dummy())
+'''
+            original_buffer = io.StringIO()
+            with redirect_stdout(original_buffer):
+                exec(original_program)
+            original_output = original_buffer.getvalue().strip()
+            # print(original_output)
+            
+            changed_buffer = io.StringIO()
+            with redirect_stdout(changed_buffer):
+                exec(changed_program)
+            changed_output = changed_buffer.getvalue().strip()
+
+            # print(original_output, changed_output)
+
+            if original_output == changed_output: accurate_results+=1
+        return accurate_results/len(inputs)
+    except Exception as e:
+        return 0
+
+    
 def evaluate(original_function, changed_function, function_name, inputs):
     accurate_results = 0
     try: 
