@@ -5,6 +5,8 @@ import alpha.evaluate_metrics as alpha
 API_URL = "https://api-inference.huggingface.co/models/bigcode/starcoder"
 headers = {"Authorization": "Bearer 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"}
 
+with open("./starcoder/prompt_file.txt", "r") as f:
+    prompt = f.read()+'\n'
 
 def query(payload):
     response = requests.post(API_URL, headers=headers, json=payload)
@@ -13,12 +15,16 @@ def query(payload):
 
 def generate_function(original_function, function_name,
         argument_name, change_to):
-    output = query({
-        "inputs": "Given a python function " + function_name + ", we want to replace the parameter " + argument_name + " with " + change_to + " and with semantics and logics preserved. Mark the start and the end of function with ¥¥¥\n.\nHere is the function:\n\n" + original_function + "\n\nHere is the replaced function, no explanation needed:\n\n¥¥¥\ndef " + function_name + "(" + change_to,
-        })
+#    output = query({
+ #       "inputs": "Given a python function " + function_name + ", we want to replace the parameter " + argument_name + " with " + change_to + " and with semantics and logics preserved. Mark the start and the end of function with ¥¥¥\n.\nHere is the function:\n\n" + original_function + "\n\nHere is the replaced function, no explanation needed:\n\n¥¥¥\ndef " + function_name + "(" + change_to,
+  #      })
     # print(output[0]['generated_text']+"\n")
-    changed_function = output[0]['generated_text'].split('¥¥¥')[
-            2].split('\n\n')[0]
+    output = query({
+        "inputs": prompt + "Human: " + f"Given a python function '{function_name}', we want to replace the parameter '{argument_name}' with '{change_to}', with semantics and logics of the function preserved.\nHere is the function\n{original_function}\n" +  "Assistant:"
+})
+    changed_function = output[0]['generated_text'].split('Assistant:')[-1].split('-----')[0].strip()
+    main, return_statement = 'return'.join(changed_function.split('return')[0:-1]), changed_function.split('return')[-1].split('\n')[0]
+    changed_function = main+'return'+return_statement
     print(changed_function)
     return changed_function
 
@@ -45,7 +51,7 @@ def evaluate(path='./alpha/dataset/data_alpha_non_valid2.json'):
  #               original_function, changed_function, function_name, inputs)
   #      total_accuracy += accuracy
 
-    outfile = open("./alpha/evaluation_data/starcoder_data_alpha_non_valid2.json", 'w')
+    outfile = open("./alpha/evaluation_data/starcoder_data_alpha_non_valid2_few_shots.json", 'w')
     outfile.write(json.dumps(data_res))
     outfile.close()
 
