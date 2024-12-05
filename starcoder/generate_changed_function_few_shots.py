@@ -13,12 +13,7 @@ def query(payload):
     return response.json()
 
 
-def generate_function(original_function, function_name,
-        argument_name, change_to):
-#    output = query({
- #       "inputs": "Given a python function " + function_name + ", we want to replace the parameter " + argument_name + " with " + change_to + " and with semantics and logics preserved. Mark the start and the end of function with ¥¥¥\n.\nHere is the function:\n\n" + original_function + "\n\nHere is the replaced function, no explanation needed:\n\n¥¥¥\ndef " + function_name + "(" + change_to,
-  #      })
-    # print(output[0]['generated_text']+"\n")
+def generate_function(original_function, function_name, argument_name, change_to):
     output = query({
         "inputs": prompt + "Human: " + f"Given a python function '{function_name}', we want to replace the parameter '{argument_name}' with '{change_to}', with semantics and logics of the function preserved.\nHere is the function\n{original_function}\n" +  "Assistant:"
 })
