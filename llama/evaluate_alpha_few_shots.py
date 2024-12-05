@@ -4,8 +4,9 @@ import alpha.evaluate_metrics as alpha
 from transformers import AutoTokenizer
 import transformers
 import torch
+from huggingface_hub import InferenceClient
 
-model = "meta-llama/CodeLlama-7b-hf"
+model = "meta-llama/CodeLlama-7b-Instruct-hf"
 
 tokenizer = AutoTokenizer.from_pretrained(model)
 pipeline = transformers.pipeline(
@@ -15,23 +16,21 @@ pipeline = transformers.pipeline(
 	device="cuda"
 )
 
-# API_URL = "https://api-inference.huggingface.co/models/meta-llama/CodeLlama-7b-hf"
-# headers = {"Authorization": "Bearer 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"}
 DATASET = "alpha/dataset/data_nonvalid_after_change_500.json"
 
+with open("./llama/prompt_file.txt", "r") as f:
+    messages = list(json.loads(f.read()))
+
 def generate_function(original_function, function_name, argument_name, change_to):
-	prompt = f'''Given a python function {function_name}
-we want to replace the parameter {argument_name} with {change_to} and with semantics and logics preserved. 
-Mark the start and the end of function with ¥¥¥.
-Here is the function:
-<{original_function}>.
-Here is the replaced function, no explanation needed:
-¥¥¥
-def {function_name}({change_to}
-'''
-	res = pipeline(prompt,do_sample=True,top_k=10,temperature=0.1,top_p=0.95,num_return_sequences=1,eos_token_id=tokenizer.eos_token_id, max_length=200)
-	print(res[0])
-	changed_function = res[0]['generated_text'].split('¥¥¥')[2]
+	prompt = f'''Given a python function \'{function_name}\', we want to replace the parameter \'{argument_name}\' with \'{change_to}\', with semantics and logics of the function preserved. 
+    Here is the function\n{original_function}'''
+	messages.extend({"role": "user", "content":prompt})
+	completion = client.chat.completions.create(
+	    model="codellama/CodeLlama-7b-Instruct-hf", 
+		messages=messages, 
+		max_tokens=500
+	)
+	changed_function = completion.choices[0].message.content
 	print(changed_function)
 	return changed_function
 
