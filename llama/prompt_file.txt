@@ -1,29 +1,15 @@
 {
+    "data":[
     {
         "role": "system",
-        "content": "You are an expert programmer that helps to write Python code based on the user request, with concise explanations. Don't be too verbose.",
+        "content": "You are an expert programmer that helps to write Python code based on the user request, with concise explanations. Don't be too verbose."
     },
     {
         "role": "user",
-        "content": "Given a python function 'find_missing_number', we want to replace the parameter 'nums' with 'n', with semantics and logics of the function preserved. 
-    Here is the function
-    def find_missing_number(nums: list):
-        n = len(nums) + 1
-        total_sum = (n * (n + 1)) // 2
-        for i in nums:
-            total_sum -= i
-        return total_sum
-    
-    Return the replaced function"
+        "content": "Given a python function 'find_missing_number', we want to replace the parameter 'nums' with 'n', with semantics and logics of the function preserved. Here is the function\n    def find_missing_number(nums: list):\n        n = len(nums) + 1\n        total_sum = (n * (n + 1)) // 2\n        for i in nums:\n            total_sum -= i\n        return total_sum\n\nReturn the replaced function"
     },
     {
         "role": "assistant",
-        "content": "
-    def find_missing_number(n: list):
-        n_length = len(n) + 1
-        total_sum = (n_length * (n_length + 1)) // 2
-        for i in n:
-            total_sum -= i
-        return total_sum"
-    }
+        "content": "def find_missing_number(n: list):\n    n_length = len(n) + 1\n    total_sum = (n_length * (n_length + 1)) // 2\n    for i in n:\n        total_sum -= i\n    return total_sum"
+    }]
 }
