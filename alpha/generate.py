@@ -12,7 +12,7 @@ mbpp = load_dataset("google-research-datasets/mbpp", "full")
 # TODO(developer): Update and un-comment below line
 PROJECT_ID = "alpha-rename"
 vertexai.init(project=PROJECT_ID, location="us-central1")
-HINT_FILE = "alpha/hints.json"
+HINT_FILE = "AlphaRename/alpha/hints.json"
 model = GenerativeModel("gemini-1.5-flash")
 generation_config = GenerationConfig(
     temperature=1.5,
@@ -73,8 +73,8 @@ variables that might have same name with the after-changed name.
 
 NUM_SAMPLES = 500
 EACH_TIME = 5
-CHECK_VALID = False
-OUTPUT_FILE = "data_alpha_non_valid2.json"
+CHECK_VALID = True
+OUTPUT_FILE = "data_alpha_non_valid3.json"
 
 iterations = NUM_SAMPLES // EACH_TIME
 valid_data = []
@@ -111,14 +111,15 @@ with open(HINT_FILE,"r") as f:
                         valid_data.append(data)
                 else:
                     try:
-                        original_program = original_function+"\n"+function_name+"("+inputs[0]+")"
-                        changed_program  = changed_function +"\n"+function_name+"("+inputs[0]+")"
-                        #only check execution of original program if check valid is not true
-                        exec(original_program)
-                        # exec(changed_program)
+                        for i in range(len(inputs)):
+                            original_program = original_function+"\n"+function_name+"("+inputs[i]+")"
+                            changed_program  = changed_function +"\n"+function_name+"("+inputs[i]+")"
+                            #only check execution of original program if check valid is not true
+                            exec(original_program)
+                            # exec(changed_program)
                         valid_data.append(data)
                     except Exception as e:
-                        pass
+                        print("bad inputs")
         except Exception as e:
             print("bad json text")
             pass
