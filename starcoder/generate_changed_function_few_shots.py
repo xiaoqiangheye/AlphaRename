@@ -60,8 +60,7 @@ Assistant:
     return changed_function
 
 
-def generate_function(original_function, function_name,
-        argument_name, change_to):
+def generate_function(original_function, function_name, argument_name, change_to):
     output = query({
         "inputs": prompt + "Human: " + f"Given a python function '{function_name}', we want to replace the parameter '{argument_name}' with '{change_to}', with semantics and logics of the function preserved.\nHere is the function\n{original_function}\n" +  "Assistant:"
 })
