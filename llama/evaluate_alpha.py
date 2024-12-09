@@ -15,8 +15,6 @@ pipeline = transformers.pipeline(
         device="cuda"
         )
 
-# API_URL = "https://api-inference.huggingface.co/models/meta-llama/CodeLlama-7b-hf"
-# headers = {"Authorization": "Bearer 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"}
 DATASET = "alpha/dataset/data_alpha_347_valid.json"
 
 def generate_function(original_function, function_name, argument_name, change_to):
