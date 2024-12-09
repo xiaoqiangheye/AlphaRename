@@ -66,7 +66,7 @@ def evaluate(original_function, changed_function, function_name, inputs):
             if original_output == changed_output: accurate_results+=1
             #else: print(original_output, changed_output)
         print(accurate_results/len(inputs))
-        return accurate_results/len(inputs)
+        return accurate_results==len(inputs)
     except Exception as e:
         return 0
 
