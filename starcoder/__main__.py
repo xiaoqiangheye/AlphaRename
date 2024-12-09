@@ -1,3 +1,5 @@
 from .generate_changed_function import evaluate
+from .generate_changed_function_few_shots import evaluate
+from .generate_changed_function_few_shots import evaluate_cot
 
-evaluate()
+evaluate_cot()

@@ -32,6 +32,7 @@ Here is the original function
 
 def evaluate_with_cot(DATASET = "alpha/dataset/data_alpha_non_valid2.json"):
   # read dataset
+  res = []
   with open(DATASET) as f:
       dataset = json.load(f)
       accuracy, total_accuracy = 0.0, 0.0
@@ -64,7 +65,16 @@ def evaluate_with_cot(DATASET = "alpha/dataset/data_alpha_non_valid2.json"):
           print("changed function:" + changed_function)
           
           accuracy = alpha.evaluate(original_function, changed_function, name, inputs)
+          if(accuracy == 1):
+            res_j["target_argument"] = target_argu
+            res_j["original_function"] = original_function
+            res_j["change_to"] = change_ar
+            res_j["function_name"] = name
+            res.append(res_j)
           total_accuracy += accuracy
+
+  with open("./alpha/evaluation_data/gemini_cot_reasoning_result.json", 'w') as outfile:
+    json.dump(res, outfile, indent=1)
 
   print("final accuracy: ", total_accuracy/total_count)
   return total_accuracy, total_count

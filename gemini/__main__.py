@@ -1,3 +1,4 @@
 from .evaluate_alpha import evaluate
+from .evaluate_alpha import evaluate_with_cot
 
-evaluate()
+evaluate_with_cot()
