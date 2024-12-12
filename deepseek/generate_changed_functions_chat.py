@@ -21,20 +21,29 @@ Here is the function
 torch.cuda.empty_cache()
 for data in data_res:
 
-    argument_name = data["target_argument"]
+    target_argument = data["target_argument"]
     change_to = data["change_to"]
     changed_function = data["changed_function"]
     original_function = data["original_function"]
     function_name = data["function_name"]
     inputs = data["inputs"]
 
-    input_text = f'''Given a python function {function_name} we want to replace the parameter '{argument_name}' with '{change_to}'. Here is the original function:\n\n{original_function}\n\nHere is the replaced function, no explanation needed:\n\ndef {function_name}({change_to}):'''
-    model_input = tokenizer(input_text, return_tensors="pt").to(model.device)
-    model_output = model.generate(**model_input, max_length=len(original_function)+100)
-    changed_function = tokenizer.decode(model_output[0], skip_special_tokens=True).split('Here is the replaced function, no explanation needed:')[1].split('A:')[0].strip()
+    messages=[
+    { 'role': 'user', 'content': f'''{prompt}
+  {original_function}
+  ``function ends``
+  1.The argument we want you to change is '{target_argument}'
+  2.You need to change this argument to '{change_to}' and preserve the semantics of the function.
+  3.Generate only the output as the following json format, do not include any extra output, do not include any comments. Only generate the output as the following format.
+  '''}]
+    model_input = tokenizer.apply_chat_template(messages, add_generation_prompt=True, return_tensors="pt").to(model.device)
+    model_output = model.generate(model_input, max_new_tokens=512, do_sample=False, top_k=50, top_p=0.95, num_return_sequences=1, eos_token_id=tokenizer.eos_token_id)
+    output = tokenizer.decode(model_output[0], skip_special_tokens=True)
+    changed_function = output.strip().split('``function begins``')[2].split('``function ends``')[0]
     print(changed_function)
     data["changed_function"] = changed_function
 
-outfile = open("../alpha/evaluation_data/deepseek_data_alpha_non_valid2.json", 'w')
+outfile = open("../alpha/evaluation_data/deepseek_chat_data_alpha.json", 'w')
 outfile.write(json.dumps(data_res))
 outfile.close()
+
