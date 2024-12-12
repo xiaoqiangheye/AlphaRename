@@ -30,6 +30,46 @@ Here is the original function
 ``function begins``
 '''
 
+with open("./starcoder/prompt_file.txt", "r") as f:
+    few_shot_prompt = '''You are a code programmer, we would like you to perform a alpha-renaming task a given function, 
+changing a function argument name to another name and preserve the semantics. \n
+''' + f.read()+'\n'
+
+def few_shot_evaluate(DATASET = "alpha/dataset/data_alpha_non_valid2.json"):
+  # read dataset
+  with open(DATASET) as f:
+      dataset = json.load(f)
+      accuracy, total_accuracy = 0.0, 0.0
+      total_count = 0
+      for data in dataset:
+          total_count += 1
+          target_argu = data["target_argument"]
+          change_ar  = data["change_to"]
+          original_function = data["original_function"]
+          expected = data["changed_function"]
+          name = data["function_name"]
+          inputs = data["inputs"]
+
+          prompt_task = f'''{few_shot_prompt}
+  {original_function}
+  '''
+          response = model.generate_content(prompt_task, generation_config=generation_config)
+          print(response.text)
+
+          res_j = json.loads(response.text)
+          changed_function = res_j["changed_function"]
+          print("changed function:" + changed_function)
+          
+          accuracy = alpha.evaluate(original_function, changed_function, name, inputs)
+          total_accuracy += accuracy
+      
+  outfile = open("./alpha/evaluation_data/gemini_few_shot_data_alpha_non_valid2.json", 'w')
+  outfile.write(json.dumps(data_res))
+  outfile.close()
+
+  print("final accuracy: ", total_accuracy/total_count)
+  return total_accuracy, total_count
+  
 def evaluate_with_cot(DATASET = "alpha/dataset/data_alpha_non_valid2.json"):
   # read dataset
   res = []
