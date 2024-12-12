@@ -20,8 +20,8 @@ generation_config = GenerationConfig(
 prompt = lambda num, hint: f'''
 We would like to generate datasets for one step of symbolic execution task, a function takes an argument with type T will be supplied with a open term of type T that is not
 fully evaluated value, so it may contains variables, function applications, ...etc. The task is to substitute the argument of function
-with this expression and output the substituted body. This step correspond symbolic function application that applying a function
-to an symbolic expressions. The task also requires one to resolve the name conflicts between the open expressions and the variables inside the functions.
+with this expression and output the substituted function with no argument. Executing output argumentless function is equivalent to applying original function
+to input expression with any environment. The task also requires one to resolve the name conflicts between the open expressions and the variables inside the functions.
 Generate dataset of pairs of original python function, a target argument name, an open expression, and the expression after substitution, output with the following format.
 Note that you only need to generate the dataset, not the alpha-renaming function. The dataset is with the following format.
 
@@ -45,8 +45,9 @@ We also have an example output. Notice function foo has a local variable name x,
    "original_function": “def foo (y: int):
                               x = 1
 	                          return y + x + 1”,
-   "output_expr": “z = 1
-	               return x + 2 + z + 1”,
+   "output_expr": “def foo():
+                       z = 1
+	                   return x + 2 + z + 1”,
    "function_name" : "foo", 
    "inputs": ["5", "4", "1"]
 }}

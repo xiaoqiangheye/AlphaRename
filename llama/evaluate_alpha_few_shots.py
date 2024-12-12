@@ -16,7 +16,9 @@ pipeline = transformers.pipeline(
         device="cuda"
         )
 
-DATASET = "/home/vl2395/AlphaRename/alpha/dataset/data_alpha_non_valid_after_change_500.json"
+
+torch.cuda.empty_cache()
+
 
 with open("./llama/prompt_file.txt", "r") as f:
     messages = json.loads(f.read())['data']
@@ -26,6 +28,7 @@ def generate_function(original_function, function_name, argument_name, change_to
     Here is the function\n{original_function}'''
     messages.append({"role": "user", "content":prompt})
     print('messages', messages)
+    torch.cuda.empty_cache()
     res = pipeline(prompt,do_sample=True,top_k=10,temperature=0.1,top_p=0.95,num_return_sequences=1,eos_token_id=tokenizer.eos_token_id, max_length=len(original_function)+100) 
     print('\nres', res[0])
     changed_function = res[0]['generated_text']
@@ -34,7 +37,7 @@ def generate_function(original_function, function_name, argument_name, change_to
     return changed_function
 
 
-def evaluate():
+def evaluate(DATASET = "./alpha/dataset/data_alpha_non_valid_after_change_500.json"):
     f = open(DATASET, 'r')
     data_res = json.loads(f.read())
 

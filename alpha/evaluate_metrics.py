@@ -11,28 +11,27 @@ def evaluate_substitution(original_function, function_name, argument, expr, outp
     accurate_results = 0
     try:
         for val in inputs:
-            original_program = original_function+"\n"+"print("+function_name+f"(lambda {argument}:{expr})({inputs[val]}))"
-            changed_program = '''
-def dummy():
-    {output_expr}
-print(dummy())
+            original_program = original_function+"\n"+"print("+function_name+f"((lambda {argument}:{expr})({val})))"
+            changed_program = f'''
+{argument} = {val}
+{output_expr}
+print({function_name}())
 '''
-            original_buffer = io.StringIO()
-            with redirect_stdout(original_buffer):
-                exec(original_program)
-            original_output = original_buffer.getvalue().strip()
-            # print(original_output)
             
             changed_buffer = io.StringIO()
             with redirect_stdout(changed_buffer):
-                exec(changed_program)
+                exec(changed_program,{})
             changed_output = changed_buffer.getvalue().strip()
 
-            # print(original_output, changed_output)
+            original_buffer = io.StringIO()
+            with redirect_stdout(original_buffer):
+                exec(original_program,{})
+            original_output = original_buffer.getvalue().strip()
 
             if original_output == changed_output: accurate_results+=1
         return accurate_results/len(inputs)
     except Exception as e:
+        print(e)
         return 0
 
     
@@ -49,13 +48,13 @@ def evaluate(original_function, changed_function, function_name, inputs):
 
             original_buffer = io.StringIO()
             with redirect_stdout(original_buffer):
-                exec(original_program)
+                exec(original_program,{})
             original_output = original_buffer.getvalue().strip()
             
             changed_buffer = io.StringIO()
             try:
                 with redirect_stdout(changed_buffer):
-                    exec(changed_program)
+                    exec(changed_program,{})
                 changed_output = changed_buffer.getvalue().strip()
             except TimeoutError as e:
                 print(e)

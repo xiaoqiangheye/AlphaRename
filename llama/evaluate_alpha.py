@@ -15,6 +15,28 @@ pipeline = transformers.pipeline(
         device="cuda"
         )
 
+torch.cuda.empty_cache()
+with open("./starcoder/prompt_file_cot.txt", "r") as f:
+    few_shot_cot = json.load(f)
+    few_shot_cot_promt = ""
+    for data in few_shot_cot:
+        cot = data["step-by-step thoughts"]
+        changed = data["changed_function"]
+        original = data["original_function"]
+        name = data["function_name"]
+        argument = data["target_argument"]
+        change_to = data["change_to"]
+        few_shot_cot_promt += f'''Human: Given a python function {name} we want to replace the parameter '{argument}' with '{change_to}', with semantics and logics of the function preserved. 
+Here is the function
+{original}
+
+Analyze the problems step by step and return the replaced function
+Assistant:
+{cot}
+
+returned function:
+{changed}
+'''
 
 def generate_function(original_function, function_name, argument_name, change_to):
     prompt = f'''Given a python function {function_name}
@@ -43,7 +65,7 @@ Analyze the problems step by step and return the replaced function
 Assistant:
 '''
 
-    res = pipeline(prompt,do_sample=True,top_k=10,temperature=0.1,top_p=0.95,num_return_sequences=1,eos_token_id=tokenizer.eos_token_id, max_length=200)
+    res = pipeline(prompt,do_sample=True,top_k=10,temperature=0.1,top_p=0.95,num_return_sequences=1,eos_token_id=tokenizer.eos_token_id, max_length=len(original_function)+1000)
     print(res[0])
     changed_function = res[0]['generated_text']
     print(changed_function)
@@ -54,6 +76,7 @@ Assistant:
 def evaluate_cot(path='./alpha/dataset/data_alpha_non_valid2.json'):
     f = open(path, 'r')
     data_res = json.loads(f.read())
+    print(len(data_res))
     total_count = 0
     total_accuracy = 0
     for data in data_res:
@@ -69,7 +92,8 @@ def evaluate_cot(path='./alpha/dataset/data_alpha_non_valid2.json'):
             changed_function = generate_cot_function(
                     original_function, function_name, argument_name, change_to)
             data["changed_function"] = changed_function
-        except:
+        except Exception as e:
+            print(e)
             continue
 
         accuracy = alpha.evaluate(
@@ -77,7 +101,7 @@ def evaluate_cot(path='./alpha/dataset/data_alpha_non_valid2.json'):
         print(accuracy)
         total_accuracy += accuracy
     
-    outfile = open("./alpha/evaluation_data/starcoder_data_alpha_non_valid2_cot.json", 'w')
+    outfile = open("./alpha/evaluation_data/llama_data_alpha_non_valid2_cot.json", 'w')
     outfile.write(json.dumps(data_res))
     outfile.close()
     print("final accuracy:", total_accuracy/total_count)
@@ -85,9 +109,8 @@ def evaluate_cot(path='./alpha/dataset/data_alpha_non_valid2.json'):
 
 
 def evaluate(path = "alpha/dataset/data_alpha_347_valid.json"):
-	f = open(path, 'r')
-	data_res = json.loads(f.read())
-
+    f = open(path, 'r')
+    data_res = json.loads(f.read())
     total_accuracy = 0.0
     total_count = 0
     for data in data_res:
@@ -107,7 +130,7 @@ def evaluate(path = "alpha/dataset/data_alpha_347_valid.json"):
         outfile = open("./alpha/evaluation_data/llama_data_alpha_347_valid.json", 'w')
         outfile.write(json.dumps(data_res))
         outfile.close()
-#        accuracy = alpha.evaluate(original_function, changed_function, argument_name, inputs)
- #       total_accuracy += accuracy
+        #accuracy = alpha.evaluate(original_function, changed_function, argument_name, inputs)
+        #total_accuracy += accuracy
 
-  #  print("final accuracy: ", total_accuracy/total_count)
+    #print("final accuracy: ", total_accuracy/total_count)
