@@ -93,6 +93,29 @@ def start_evaluate(path="alpha/deepseek_data_alpha.json"):
     print("final accuracy: ", total_accuracy/total_count)
     return total_accuracy/total_count
 
+def start_evaluate_substitution(path="alpha/deepseek_data_alpha.json"):
+
+    with open(path, 'r') as f:
+        data_res = json.loads(f.read())
+
+    total_count, total_accuracy = 0, 0
+    for data in data_res:
+        total_count +=1 
+        expr = data["expr"]
+        variable = data["variable"]
+        original_function = data["original_function"]
+        output_expr = data["output_expr"]
+        function_name = data["function_name"]
+        inputs = data["inputs"]
+        changed_function = data["changed_function"]
+
+        accuracy = evaluate_substitution(original_function.strip(), function_name, variable, expr, output_expr, inputs)
+        total_accuracy += accuracy
+
+        print(total_count, accuracy)
+
+    print("final accuracy: ", total_accuracy/total_count)
+    return total_accuracy/total_count
 
 
 if __name__ == "__main__":

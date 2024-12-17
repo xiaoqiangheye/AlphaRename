@@ -1,4 +1,5 @@
 from alpha.evaluate_metrics import start_evaluate
+from alpha.evaluate_metrics import start_evaluate_substitution
 import gemini.evaluate_alpha as alpha
 
 f = open('model_evaluation_results_new.txt', 'w')
@@ -7,11 +8,14 @@ starcoder_results = start_evaluate('alpha/evaluation_data/starcoder_data_alpha_n
 print('starcoder: ', starcoder_results)
 f.write('starcoder: ' + str(starcoder_results) + '\n')
 
-deepseek_results = start_evaluate('alpha/evaluation_data/deepseek_data_alpha_non_valid2.json')
-print('deepseek: ', deepseek_results)
-f.write('deepseek: ' + str(deepseek_results) + '\n')
+deepseek_substitution_results = start_evaluate_substitution('/home/vl2395/AlphaRename/alpha/evaluation_data/deepseek_data_substitution_tasks.json')
+print('deepseek substitution: ', deepseek_substitution_results)
+f.write('deepseek substitution: ' + str(deepseek_substitution_results) + '\n')
 
+deepseek_few_shot_results = start_evaluate('/home/vl2395/AlphaRename/alpha/evaluation_data/deepseek_data_alpha_non_valid2_few_shot.json')
+print('deepseek few shot: ', deepseek_few_shot_results)
+f.write('deepseek few shot: ' + str(deepseek_few_shot_results) + '\n')
 
-#gemini_results = alpha.evaluate("alpha/data_alpha_non_valid_after_change_500.json")
-#print('gemini: ', gemini_results)
-#f.write('gemini: ' + str(gemini_results) + '\n')
+gemini_results = alpha.evaluate("alpha/data_alpha_non_valid_after_change_500.json")
+print('gemini: ', gemini_results)
+f.write('gemini: ' + str(gemini_results) + '\n')
