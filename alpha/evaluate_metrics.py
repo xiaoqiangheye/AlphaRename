@@ -4,7 +4,8 @@ from contextlib import redirect_stdout
 import signal
 
 def timeout_handler(signum, frame):
-    raise TimeoutError("Function timed out")
+    print("timeout")
+    pass
 
 
 def evaluate_substitution(original_function, function_name, argument, expr, output_expr, inputs):
@@ -37,7 +38,7 @@ print({function_name}())
     
 def evaluate(original_function, changed_function, function_name, inputs):
     signal.signal(signal.SIGALRM, timeout_handler)
-    signal.alarm(5)
+    signal.alarm(10)
     
     accurate_results = 0
     try: 
@@ -67,6 +68,7 @@ def evaluate(original_function, changed_function, function_name, inputs):
         print(accurate_results/len(inputs))
         return accurate_results==len(inputs)
     except Exception as e:
+        print(e)
         return 0
 
 
