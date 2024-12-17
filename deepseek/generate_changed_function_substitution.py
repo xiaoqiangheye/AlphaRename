@@ -36,7 +36,7 @@ Here is the function
 '''
 
 torch.cuda.empty_cache()
-for data in data_res[:5]:
+for data in data_res:
 
     expr = data["expr"]
     variable = data["variable"]
@@ -58,7 +58,7 @@ def {function_name}():'''
 
     model_input = tokenizer(input_text, return_tensors="pt").to(model.device)
     model_output = model.generate(**model_input, max_length=len(original_function)+100)
-    changed_function = tokenizer.decode(model_output[0], skip_special_tokens=True).split('Here is the replaced function, no explanation needed:')[1].split('A:')[0].strip()
+    changed_function = tokenizer.decode(model_output[0], skip_special_tokens=True).split('``function begins``')[1].split('``function ends``')[0].strip()
     print(changed_function)
     data["changed_function"] = changed_function
 
