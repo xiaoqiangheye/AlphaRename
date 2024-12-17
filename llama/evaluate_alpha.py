@@ -27,19 +27,21 @@ with open("./starcoder/prompt_file_cot.txt", "r") as f:
     name = data["function_name"]
     argument = data["target_argument"]
     change_to = data["change_to"]
-    few_shot_cot_promt = few_shot_cot_promt + f'''#User: Given a python function {name} we want to replace the parameter '{argument}' with '{change_to}', with semantics and logics of the function preserved. 
+    few_shot_cot_promt = few_shot_cot_promt + f'''
+Here is one example,
+#User: Given a python function {name} we want to replace the parameter '{argument}' with '{change_to}', with semantics and logics of the function preserved. 
 Here is the original function:
 {original}
-Analyze the problems step by step and return the replaced function. Mark the returned result with ```python.
+Analyze the problems step by step and return the replaced function. Mark the returned result with ```python. Only generate one example.
 '''
 
     few_shot_cot_promt = few_shot_cot_promt + f'''
 #Assistant:
-{cot}
-
 ```python
 {changed}
 ```
+
+{cot}
 '''
 
 
@@ -62,14 +64,16 @@ def {function_name}({change_to}):
 
 def generate_cot_function(original_function, function_name, argument_name, change_to):
     torch.cuda.empty_cache()
-    prompt = few_shot_cot_promt + f'''#User: Given a python function {function_name} we want to replace the parameter '{argument_name}' with '{change_to}'. Here is the original function:
+    prompt = few_shot_cot_promt + f'''
+#System: Now generate the result for the following user provided task.
+#User: Given a python function {function_name} we want to replace the parameter '{argument_name}' with '{change_to}'. Here is the original function:
 {original_function}
-Analyze the problems step by step and return the replaced function, Mark the returned result with ```python.
+Analyze the problems step by step and return the replaced function, Mark the returned result with ```python. Only generate one example.
 '''
     #print(prompt)
-    res = pipeline(prompt,do_sample=True,top_k=10,temperature=1,top_p=0.95,num_return_sequences=1,eos_token_id=tokenizer.eos_token_id, max_length=len(original_function)+1500)
-    #print(res[0])
-    changed_function = res[0]['generated_text'].split("#Assistant:")[-1].split('```python')[1].split("```")[0]
+    res = pipeline(prompt,do_sample=False,top_k=40,temperature=1,top_p=0.95,num_return_sequences=1,eos_token_id=tokenizer.eos_token_id, max_length=len(original_function)+800)
+    print(res[0])
+    changed_function = res[0]['generated_text'].split("#Assistant:")[2].split('```python')[1].split("```")[0]
     print(changed_function)
     return changed_function
 
@@ -89,7 +93,7 @@ def evaluate_cot(path='./alpha/dataset/data_alpha_non_valid2.json'):
         original_function = data["original_function"]
         function_name = data["function_name"]
         inputs = data["inputs"]
-
+        print(original_function)
         try:
             changed_function = generate_cot_function(
                     original_function, function_name, argument_name, change_to)
