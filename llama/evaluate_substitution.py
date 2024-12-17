@@ -6,7 +6,7 @@ import transformers
 import torch
 from huggingface_hub import InferenceClient
 
-model = "meta-llama/CodeLlama-7b-Instruct"
+model = "meta-llama/CodeLlama-7b-hf"
 
 tokenizer = AutoTokenizer.from_pretrained(model)
 pipeline = transformers.pipeline(
@@ -45,15 +45,15 @@ torch.cuda.empty_cache()
 
 def generate_function(input_text):
     torch.cuda.empty_cache()
-    res = pipeline(prompt+input_text,do_sample=True,top_k=10,temperature=0.1,top_p=0.95,num_return_sequences=1,eos_token_id=tokenizer.eos_token_id, max_length=len(original_function)+100) 
-    print('\nres', res[0])
-    changed_function = res[0]['generated_text']
+    res = pipeline(prompt+input_text,do_sample=True,top_k=10,temperature=0.1,top_p=0.95,num_return_sequences=1,eos_token_id=tokenizer.eos_token_id, max_length=len(input_text)) 
+#    print('\nres', res[0])
+    changed_function = res[0]['generated_text'].split('``function begins``')[1].split('``function ends``')[0].strip()
 
-    print('changed', changed_function)
+    #print('changed', changed_function)
     return changed_function
 
 
-def evaluate(DATASET = "./alpha/dataset/data_alpha_non_valid_after_change_500.json"):
+def evaluate(DATASET = "./alpha/dataset/data_substitution_tasks.json"):
     f = open(DATASET, 'r')
     data_res = json.loads(f.read())
 
@@ -81,13 +81,14 @@ def evaluate(DATASET = "./alpha/dataset/data_alpha_non_valid_after_change_500.js
         changed_function = generate_function(input_text)
         data['changed_function'] = changed_function
 
-        print("original", original_function)
+    #    print("original", original_function)
         print("changed", changed_function)
 
         accuracy = alpha.evaluate_substitution(original_function, function_name, variable, expr, output_expr, inputs)
         total_accuracy += accuracy
+        total_count += 1
 
     print("final accuracy: ", total_accuracy/total_count)
-    outfile = open("../alpha/evaluation_data/llama_data_substitution_tasks.json", 'w')
+    outfile = open("./alpha/evaluation_data/llama_data_substitution_tasks.json", 'w')
     outfile.write(json.dumps(data_res))
     outfile.close()
