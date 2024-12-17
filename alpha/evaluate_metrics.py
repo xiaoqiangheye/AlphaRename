@@ -29,7 +29,7 @@ print({function_name}())
             original_output = original_buffer.getvalue().strip()
 
             if original_output == changed_output: accurate_results+=1
-        return accurate_results/len(inputs)
+        return accurate_results==len(inputs)
     except Exception as e:
         print(e)
         return 0
@@ -86,7 +86,7 @@ def start_evaluate(path="alpha/deepseek_data_alpha.json"):
         function_name = data["function_name"]
         inputs = data["inputs"]
         accuracy = evaluate(original_function.strip(), changed_function.strip(), function_name, inputs)
-        total_accuracy += accuracy
+        total_accuracy += accuracy 
 
         print(total_count, accuracy)
 
@@ -110,7 +110,7 @@ def start_evaluate_substitution(path="alpha/deepseek_data_alpha.json"):
         changed_function = data["changed_function"]
 
         accuracy = evaluate_substitution(original_function.strip(), function_name, variable, expr, output_expr, inputs)
-        total_accuracy += accuracy
+        total_accuracy += accuracy 
 
         print(total_count, accuracy)
 
