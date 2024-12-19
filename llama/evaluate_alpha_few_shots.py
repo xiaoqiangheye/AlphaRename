@@ -23,13 +23,15 @@ torch.cuda.empty_cache()
 with open("./llama/prompt_file.txt", "r") as f:
     messages = json.loads(f.read())['data']
 
+def generate_prompt():
+    few_shot_prompt = ""
+    for ele in messages:
+        few_shot_prompt += f'''#{ele["role"]}: {ele["content"]}'''
 def generate_function(original_function, function_name, argument_name, change_to):
-    prompt = f'''Given a python function \'{function_name}\', we want to replace the parameter \'{argument_name}\' with \'{change_to}\', with semantics and logics of the function preserved. 
+    prompt = f'''\n#User: Given a python function \'{function_name}\', we want to replace the parameter \'{argument_name}\' with \'{change_to}\', with semantics and logics of the function preserved. 
     Here is the function\n{original_function}'''
-    messages.append({"role": "user", "content":prompt})
-    print('messages', messages)
     torch.cuda.empty_cache()
-    res = pipeline(prompt,do_sample=True,top_k=10,temperature=0.1,top_p=0.95,num_return_sequences=1,eos_token_id=tokenizer.eos_token_id, max_length=len(original_function)+100) 
+    res = pipeline(few_shot_prompt+prompt,do_sample=True,top_k=10,temperature=0.1,top_p=0.95,num_return_sequences=1,eos_token_id=tokenizer.eos_token_id, max_length=len(original_function)+100) 
     print('\nres', res[0])
     changed_function = res[0]['generated_text']
 

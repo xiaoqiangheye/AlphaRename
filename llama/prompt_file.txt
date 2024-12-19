@@ -1,23 +1,23 @@
 {
 	"data":[
 	{
-		"role": "system",
-			"content": "You are an expert programmer that helps to write Python code based on the user request."
+		"role": "System",
+		"content": "You are an expert programmer that helps to write Python code based on the user request."
 	},
 	{
-		"role": "user",
+		"role": "User",
 		"content": "Given a python function 'find_missing_number', we want to replace the parameter 'nums' with 'n', with semantics and logics of the function preserved. Here is the function\n    def find_missing_number(nums: list):\n        n = len(nums) + 1\n        total_sum = (n * (n + 1)) // 2\n        for i in nums:\n            total_sum -= i\n        return total_sum"
 	},
 	{
-		"role": "assistant",
+		"role": "Assistant",
 		"content": "def find_missing_number(n: list):\n    n_length = len(n) + 1\n    total_sum = (n_length * (n_length + 1)) // 2\n    for i in n:\n        total_sum -= i\n    return total_sum"
 	},
 	{
-		"role": "user",
+		"role": "User",
 		"content":"Given a python function 'count_vowels', we want to replace the parameter 'str' with 'a', with semantics and logics of the function preserved.\nHere is the function\ndef count_vowels(str: str):\n  a = 0\n  vowels = 'aeiouAEIOU'\n  for char in str:\n    if char in vowels:\n      a += 1\n  return a"
 	},
 	{
-		"role": "assistant",
+		"role": "Assistant",
 		"content": "def count_vowels(a: str):\n  count = 0\n  vowels = 'aeiouAEIOU'\n  for char in a:\n    if char in vowels:\n      count += 1\n  return count"
 	}]
 }
