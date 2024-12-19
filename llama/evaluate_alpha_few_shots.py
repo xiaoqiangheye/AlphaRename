@@ -23,23 +23,26 @@ torch.cuda.empty_cache()
 with open("./llama/prompt_file.txt", "r") as f:
     messages = json.loads(f.read())['data']
 
-def generate_prompt():
-    few_shot_prompt = ""
-    for ele in messages:
-        few_shot_prompt += f'''#{ele["role"]}: {ele["content"]}'''
+few_shot_prompt = ""
+for ele in messages:
+    few_shot_prompt += f'''#{ele["role"]}: {ele["content"]}\n'''
+
 def generate_function(original_function, function_name, argument_name, change_to):
     prompt = f'''\n#User: Given a python function \'{function_name}\', we want to replace the parameter \'{argument_name}\' with \'{change_to}\', with semantics and logics of the function preserved. 
     Here is the function\n{original_function}'''
     torch.cuda.empty_cache()
-    res = pipeline(few_shot_prompt+prompt,do_sample=True,top_k=10,temperature=0.1,top_p=0.95,num_return_sequences=1,eos_token_id=tokenizer.eos_token_id, max_length=len(original_function)+100) 
-    print('\nres', res[0])
-    changed_function = res[0]['generated_text']
+    res = pipeline(few_shot_prompt+prompt,do_sample=True,top_k=10,temperature=0.1,top_p=0.95,num_return_sequences=1,eos_token_id=tokenizer.eos_token_id, max_length=len(few_shot_prompt)) 
+#    print(few_shot_prompt+prompt)
+#    print('\nres', res[0]['generated_text'])
+    changed_function = res[0]['generated_text'].split('#Assistant:')[3].split("#User:")[0]
+    main, return_statement = 'return'.join(changed_function.split('return')[0:-1]), changed_function.split('return')[-1].split('\n')[0]
+    changed_function = main+'return'+return_statement
 
     print('changed', changed_function)
     return changed_function
 
 
-def evaluate(DATASET = "./alpha/dataset/data_alpha_non_valid_after_change_500.json"):
+def evaluate(DATASET = "./alpha/dataset/data_alpha_non_valid2.json"):
     f = open(DATASET, 'r')
     data_res = json.loads(f.read())
 
@@ -57,7 +60,11 @@ def evaluate(DATASET = "./alpha/dataset/data_alpha_non_valid_after_change_500.js
         changed_function = generate_function(original_function, function_name, argument_name, change_to)
         print("original", original_function)
         print("changed", changed_function)
-        accuracy = alpha.evaluate(original_function, changed_function, argument_name, inputs)
-        total_accuracy += accuracy
+        print("\n")
+  #      accuracy = alpha.evaluate(original_function, changed_function, argument_name, inputs)
+   #     total_accuracy += accuracy
 
-    print("final accuracy: ", total_accuracy/total_count)
+    #print("final accuracy: ", total_accuracy/total_count)
+    outfile = open("./alpha/evaluation_data/llama_data_alpha_non_valid2_few_shots.json", 'w')
+    outfile.write(json.dumps(data_res))
+    outfile.close()
