@@ -3,10 +3,6 @@ import io
 from contextlib import redirect_stdout
 import signal
 
-def timeout_handler(signum, frame):
-    print("timeout")
-    pass
-
 
 def evaluate_substitution(original_function, function_name, argument, expr, output_expr, inputs):
     accurate_results = 0
@@ -37,23 +33,55 @@ print({function_name}())
 
     
 def evaluate(original_function, changed_function, function_name, inputs):
-    signal.signal(signal.SIGALRM, timeout_handler)
-    signal.alarm(10)
-    
     accurate_results = 0
     try: 
         for val in inputs:
             function_call = function_name+"("+val+")"
-            original_program = original_function + "\nprint(" + function_call +')'
-            changed_program  = changed_function + "\nprint(" + function_call +')'
+            original_program = f'''
 
-            original_buffer = io.StringIO()
-            with redirect_stdout(original_buffer):
-                exec(original_program,{})
-            original_output = original_buffer.getvalue().strip()
+import signal
+{original_function}
+
+def timeout_handler(signum, frame):
+    signal.alarm(0)
+    raise TimeoutError("time out")
+signal.signal(signal.SIGALRM, timeout_handler)
+signal.alarm(5)
+
+try:    
+    print({function_call})
+except Exception:
+    print("error")
+finally:
+    signal.alarm(0)
+'''
+            
+            changed_program  = f'''
+import signal
+
+{changed_function}
+
+def timeout_handler(signum, frame):
+   signal.alarm(0)
+   raise TimeoutError("time out")
+signal.signal(signal.SIGALRM, timeout_handler)
+signal.alarm(5)
+try:
+    print({function_call})
+except Exception:
+    print("error")
+finally:
+    signal.alarm(0) 
+'''
+            print(changed_program)
+           
             
             changed_buffer = io.StringIO()
             try:
+                original_buffer = io.StringIO()
+                with redirect_stdout(original_buffer):
+                    exec(original_program,{})
+                original_output = original_buffer.getvalue().strip()
                 with redirect_stdout(changed_buffer):
                     exec(changed_program,{})
                 changed_output = changed_buffer.getvalue().strip()
