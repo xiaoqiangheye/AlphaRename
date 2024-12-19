@@ -41,7 +41,7 @@ def query(payload):
 def generate_function(original_function, function_name,
         expr, variable):
     output = query({
-        "inputs": f'''
+        "inputs": prompt + f'''
 {original_function}
 ``function ends``
 Substitute the function argument with the expression {expr} and generate the new function
@@ -52,8 +52,8 @@ Here is the replaced function, no explanation needed:
 ``function begins``
 def {function_name}():'''
         })
-    # print(output[0]['generated_text']+"\n")
-    changed_function = output[0]['generated_text'].split('``function begins``')[1].split('``function ends``')[0]
+    print(output[0]['generated_text'])
+    changed_function = output[0]['generated_text'].split("Here is the replaced function, no explanation needed:")[1].split('``function begins``')[1].split('``function ends``')[0]
     print(changed_function)
     return changed_function
 
@@ -80,6 +80,7 @@ def evaluate(path='./alpha/dataset/data_substitution_tasks.json'):
         accuracy = alpha.evaluate_substitution(
                original_function, function_name, variable, expr, changed_function, inputs)
         print(accuracy)
+        print("accuracy:", total_accuracy/total_count)
         total_accuracy += accuracy
 
     outfile = open("./alpha/evaluation_data/starcoder_substitution.json", 'w')

@@ -6,7 +6,7 @@ import transformers
 import torch
 from huggingface_hub import InferenceClient
 
-model = "meta-llama/CodeLlama-7b-Instruct"
+model = "meta-llama/CodeLlama-7b-Instruct-hf"
 
 tokenizer = AutoTokenizer.from_pretrained(model)
 pipeline = transformers.pipeline(
@@ -45,7 +45,7 @@ torch.cuda.empty_cache()
 
 def generate_function(input_text):
     torch.cuda.empty_cache()
-    res = pipeline(prompt+input_text,do_sample=True,top_k=10,temperature=0.1,top_p=0.95,num_return_sequences=1,eos_token_id=tokenizer.eos_token_id, max_length=len(original_function)+100) 
+    res = pipeline(prompt+input_text,do_sample=True,top_k=10,temperature=0.1,top_p=0.95,num_return_sequences=1,eos_token_id=tokenizer.eos_token_id, max_length=len(input_text)) 
     print('\nres', res[0])
     changed_function = res[0]['generated_text']
 
@@ -53,13 +53,14 @@ def generate_function(input_text):
     return changed_function
 
 
-def evaluate(DATASET = "./alpha/dataset/data_alpha_non_valid_after_change_500.json"):
+def evaluate(DATASET = "./alpha/dataset/data_substitution_tasks.json"):
     f = open(DATASET, 'r')
     data_res = json.loads(f.read())
 
     total_accuracy = 0.0
     total_count = 0
     for data in data_res:
+        total_count += 1
         expr = data["expr"]
         variable = data["variable"]
         original_function = data["original_function"]
@@ -68,15 +69,15 @@ def evaluate(DATASET = "./alpha/dataset/data_alpha_non_valid_after_change_500.js
         inputs = data["inputs"]
 
         input_text = f'''
-    {original_function}
-    ``function ends``
-    Substitute the function argument with the expression {expr} and generate the new function
-    without argument that is equivalent of applying original function with the expression.
-    Be sure to rename variables if the variables in the expression conflict with the function local variables.
+{original_function}
+``function ends``
+Substitute the function argument with the expression {expr} and generate the new function
+without argument that is equivalent of applying original function with the expression.
+Be sure to rename variables if the variables in the expression conflict with the function local variables.
 
-    Here is the replaced function, no explanation needed:
-    ``function begins``
-    def {function_name}():'''
+Here is the replaced function, no explanation needed:
+``function begins``
+def {function_name}():'''
 
         changed_function = generate_function(input_text)
         data['changed_function'] = changed_function
@@ -86,6 +87,7 @@ def evaluate(DATASET = "./alpha/dataset/data_alpha_non_valid_after_change_500.js
 
         accuracy = alpha.evaluate_substitution(original_function, function_name, variable, expr, output_expr, inputs)
         total_accuracy += accuracy
+        print(total_accuracy/total_count)
 
     print("final accuracy: ", total_accuracy/total_count)
     outfile = open("../alpha/evaluation_data/llama_data_substitution_tasks.json", 'w')
