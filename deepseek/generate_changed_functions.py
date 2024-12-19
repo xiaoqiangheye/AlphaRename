@@ -6,27 +6,6 @@ tokenizer = AutoTokenizer.from_pretrained("deepseek-ai/deepseek-coder-6.7b-base"
 model = AutoModelForCausalLM.from_pretrained("deepseek-ai/deepseek-coder-6.7b-base", trust_remote_code=True, torch_dtype=torch.bfloat16).cuda()
 
 
-with open("./starcoder/prompt_file_cot.txt", "r") as f:
-    few_shot_cot = json.load(f)
-    few_shot_cot_promt = ""
-    for data in few_shot_cot:
-        cot = data["step-by-step thoughts"]
-        changed = data["changed_function"]
-        original = data["original_function"]
-        name = data["function_name"]
-        argument = data["target_argument"]
-        change_to = data["change_to"]
-        few_shot_cot_promt += f'''Human: Given a python function {name} we want to replace the parameter '{argument}' with '{change_to}', with semantics and logics of the function preserved. 
-Here is the function
-{original}
-
-Analyze the problems step by step and return the replaced function
-Assistant:
-{cot}
-
-returned function:
-{changed}
-'''
 
 
 def evaluate(path = './alpha/dataset/data_alpha_non_valid2.json'):
