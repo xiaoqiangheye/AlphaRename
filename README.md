@@ -18,7 +18,7 @@ Run StarCoder Evaluation
 `python -m starcoder`
 
 Run DeepSeek Evaluation
-`python -m starcoder`
+`python -m deepseek`
 
 Generate alphaRename dataset
 `python alpha/generate.py`
