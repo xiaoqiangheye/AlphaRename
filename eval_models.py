@@ -16,6 +16,6 @@ deepseek_few_shot_results = start_evaluate('/home/vl2395/AlphaRename/alpha/evalu
 print('deepseek few shot: ', deepseek_few_shot_results)
 f.write('deepseek few shot: ' + str(deepseek_few_shot_results) + '\n')
 
-gemini_results = alpha.evaluate("alpha/data_alpha_non_valid_after_change_500.json")
-print('gemini: ', gemini_results)
-f.write('gemini: ' + str(gemini_results) + '\n')
+llama_few_shot_results = alpha.evaluate("alpha/evaluation_data/llama_data_alpha_non_valid2_few_shot.json")
+print('llama few shot: ', llama_few_shot_results)
+f.write('llama few shot: ' + str(llama_few_shot_results) + '\n')
